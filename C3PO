@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Titulo</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #text {
+            position: absolute;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div id="text">
+        Titulo<br />
+        Subtitulo<br />
+        Descripcion<br />
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r94/three.min.js"></script>
+    <script>
+
+
+        function cubo(posini, lado, material) {
+
+            //Coordenadas
+            var x = new THREE.Vector3(1, 0, 0);
+            var y = new THREE.Vector3(0, 1, 0);
+            var z = new THREE.Vector3(0, 0, 1);
+
+            //Vertices
+            v1 = [posini[0]       , posini[1]       , posini[2]       ];
+            v2 = [posini[0] + lado, posini[1]       , posini[2]       ];
+            v3 = [posini[0] + lado, posini[1] + lado, posini[2]       ];
+            v4 = [posini[0]       , posini[1] + lado, posini[2]       ];
+            v5 = [posini[0]       , posini[1] + lado, posini[2] + lado];
+            v6 = [posini[0]       , posini[1]       , posini[2] + lado];
+            v7 = [posini[0] + lado, posini[1]       , posini[2] + lado];
+            v8 = [posini[0] + lado, posini[1] + lado, posini[2] + lado];
+
+            //Cuadrados que generan el Cubo
+            Geometria1 = new THREE.Geometry();
+            var vertices = [v1, v2, v3, v4, v1];
+            var largoVertice = vertices.length;
+            for (i = 0; i < largoVertice; i++) {
+                x = vertices[i][0];
+                y = vertices[i][1];
+                z = vertices[i][2];
+                vector = new THREE.Vector3(x, y, z);
+                Geometria1.vertices.push(vector);
+            }
+
+            Geometria2 = new THREE.Geometry();
+            var vertices = [v1, v4, v5, v6, v1];
+            var largoVertice = vertices.length;
+            for (i = 0; i < largoVertice; i++) {
+                x = vertices[i][0];
+                y = vertices[i][1];
+                z = vertices[i][2];
+                vector = new THREE.Vector3(x, y, z);
+                Geometria2.vertices.push(vector);
+            }
+
+            Geometria3 = new THREE.Geometry();
+            var vertices = [v8, v5, v6, v7, v8];
+            var largoVertice = vertices.length;
+            for (i = 0; i < largoVertice; i++) {
+                x = vertices[i][0];
+                y = vertices[i][1];
+                z = vertices[i][2];
+                vector = new THREE.Vector3(x, y, z);
+                Geometria3.vertices.push(vector);
+            }
+
+
+            Geometria4 = new THREE.Geometry();
+            var vertices = [v8, v3, v2, v7, v8];
+            var largoVertice = vertices.length;
+            for (i = 0; i < largoVertice; i++) {
+                x = vertices[i][0];
+                y = vertices[i][1];
+                z = vertices[i][2];
+                vector = new THREE.Vector3(x, y, z);
+                Geometria4.vertices.push(vector);
+            }
+
+            //Color Cubo
+            MaterialC = new THREE.ParticleBasicMaterial({ color: material });
+ 
+            //Generacion cuadrados
+            Cuadrado1 = new THREE.Line(Geometria1, MaterialC);
+            Cuadrado2 = new THREE.Line(Geometria2, MaterialC);
+            Cuadrado3 = new THREE.Line(Geometria3, MaterialC);
+            Cuadrado4 = new THREE.Line(Geometria4, MaterialC);
+            
+            //Arreglo cuadrados
+            var Cube = [Cuadrado1, Cuadrado2, Cuadrado3, Cuadrado4];
+
+            return Cube;
+        }
+
+        //Traslacion Cubo
+        function TraslacionCubo(t, cube){
+            TraslacionCuadrado(t, cube[0])
+            TraslacionCuadrado(t, cube[1])
+            TraslacionCuadrado(t, cube[2])
+            TraslacionCuadrado(t, cube[3])
+            return cube;
+        }
+
+        //Traslacion Cuadrado
+        function TraslacionCuadrado(t, Cuadrado){
+            var matrizT = new THREE.Matrix4();  
+            matrizT.set(1, 0, 0, t[0],
+                        0, 1, 0, t[1],
+                        0, 0, 1, t[2],
+                        0, 0, 0, 1   );
+
+                    Cuadrado.applyMatrix(matrizT);
+
+            return Cuadrado;
+        }
+
+        //Escala Cubo
+        function EscalaCubo(s, cube){
+            EscalaCuadrado(s, cube[0])
+            EscalaCuadrado(s, cube[1])
+            EscalaCuadrado(s, cube[2])
+            EscalaCuadrado(s, cube[3])
+            return cube;
+        }
+
+        //Escala Cuadrado
+        function EscalaCuadrado(s, Cuadrado){
+            var matrizT = new THREE.Matrix4();  
+            matrizT.set(s[0], 0   , 0   , 0,
+                        0   , s[1], 0   , 0,
+                        0   , 0   , s[2], 0,
+                        0   , 0   , 0   , 1);
+
+                    Cuadrado.applyMatrix(matrizT);
+
+            return Cuadrado;
+        }
+
+        //Rotacion cubo
+        function RotacionCubo(r, cube){
+            RotacionCuadrado(r, cube[0]);
+            RotacionCuadrado(r, cube[1]);
+            RotacionCuadrado(r, cube[2]);
+            RotacionCuadrado(r, cube[3]);
+        }
+
+        //Rotacion cuadrado
+        function RotacionCuadrado(r, Cuadrado){
+            mtrxXRotation(r[0], Cuadrado);
+            mtrxYRotation(r[1], Cuadrado);
+            mtrxZRotation(r[2], Cuadrado);
+        }
+
+        //Rotacion x y z
+        function mtrxXRotation(Rx, Cuadrado) {
+            var matriz = new THREE.Matrix4();
+            var cs = Math.cos(Rx);
+            var ss = Math.sin(Rx);
+
+            matriz.set(1 ,  0 , 0 , 0,
+                        0 ,  cs, ss, 0,
+                        0 , -ss, cs, 0,
+                        0 ,  0 , 0 , 1);
+                Cuadrado.applyMatrix(matriz);
+
+            return Cuadrado;
+        }
+
+        function mtrxYRotation(Ry, Cuadrado) {
+            var matriz = new THREE.Matrix4();
+            var cs = Math.cos(Ry);
+            var ss = Math.sin(Ry);
+
+            matriz.set( cs, 0,-ss, 0,
+                    0  , 1, 0 , 0,
+                    ss , 0, cs, 0,
+                    0  , 0, 0 , 1);
+                Cuadrado.applyMatrix(matriz);
+            return Cuadrado;
+        }
+
+        function mtrxZRotation(Rz, Cuadrado) {
+            var matriz = new THREE.Matrix4();
+            var cs = Math.cos(Rz);
+            var ss = Math.sin(Rz);
+
+            matriz.set( cs, ss, 0, 0,
+                        -ss, cs, 0, 0,
+                         0 , 0 , 1, 0,
+                         0 , 0 , 0, 1);
+                    Cuadrado.applyMatrix(matriz);
+            return Cuadrado;
+        }
+        
+        //Grados a Radianes
+        function gR(x){
+            x = x * ((Math.PI)/180);
+            return x;
+        }
+
+        //Renderizado Cubo
+        function CubeScene(cube) {
+            
+            //Renderizado Cubo
+            scene.add(cube[0])
+            scene.add(cube[1])
+            scene.add(cube[2])
+            scene.add(cube[3])
+        }
+
+        //Funcion principal
+        function init() {
+
+            // Escena
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor(0x000000, 1.0);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            var size = 700;
+            var arrowSize = 40;
+            var divisions = 20;
+            var origin = new THREE.Vector3(0, 0, 0);
+            var x = new THREE.Vector3(1, 0, 0);
+            var y = new THREE.Vector3(0, 1, 0);
+            var z = new THREE.Vector3(0, 0, 1);
+            var color2 = new THREE.Color(0x333333);  /// 0x333333
+            var colorR = new THREE.Color(0xAA0000);
+            var colorG = new THREE.Color(0x00AA00);
+            var colorB = new THREE.Color(0x0000AA);
+
+            //Crear la Grilla
+            var gridHelperXZ = new THREE.GridHelper(size, divisions, color2, color2);
+
+            //Flechas
+            var arrowX = new THREE.ArrowHelper(x, origin, arrowSize, colorR);
+            var arrowY = new THREE.ArrowHelper(y, origin, arrowSize, colorG);
+            var arrowZ = new THREE.ArrowHelper(z, origin, arrowSize, colorB);
+
+            //Camara
+            camera.position.x = 000;
+            camera.position.y = 100;
+            camera.position.z = 400;
+            camera.lookAt(scene.position);
+
+            // Colores
+            Material = new THREE.ParticleBasicMaterial({ color: 0xFF0000 });
+
+            //Propiedades cubo
+            posini = [10, 10, 10];
+            lado = 30;
+
+            //Cubo
+            cube  = cubo(posini, lado, Material);
+
+            //Cubo Trasladado
+            cubeT = cubo(posini, lado, colorR);
+            TraslacionCubo([lado * 2, 0, 0], cubeT);
+
+            //Cubo Escalado
+            cubeS = cubo(posini, lado, colorG);
+            TraslacionCubo([(-posini[0]-(lado/2)), (-posini[1]-(lado/2)), (-posini[2]-(lado/2))], cubeS);
+            EscalaCubo([1.5, 1.5, 1.5], cubeS);
+            TraslacionCubo([posini[0]+(lado/2), posini[1]+(lado/2), posini[2]+(lado/2)], cubeS)
+            TraslacionCubo([lado * 2, 0, 0], cubeS);
+
+            //Cubo Rotado
+            cubeR = cubo(posini, lado, colorB);
+            TraslacionCubo([(-posini[0]-(lado/2)), (-posini[1]-(lado/2)), (-posini[2]-(lado/2))], cubeR);
+            EscalaCubo([1.5, 1.5, 1.5], cubeR);
+            RotacionCubo([gR(45), 0, 0], cubeR);
+            TraslacionCubo([posini[0]+(lado/2), posini[1]+(lado/2), posini[2]+(lado/2)], cubeR)
+            TraslacionCubo([lado * 2, 0, 0], cubeR);
+
+            //En el documento HTML
+            document.body.appendChild(renderer.domElement);
+
+            //Agregar elementos al escenario
+            scene.add(gridHelperXZ);
+            scene.add(arrowX);
+            scene.add(arrowY);
+            scene.add(arrowZ);
+            CubeScene(cube)
+            CubeScene(cubeT)
+            CubeScene(cubeS)
+            CubeScene(cubeR)
+            renderer.render(scene, camera);
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
